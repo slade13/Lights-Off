@@ -45,13 +45,12 @@ public class Utilities {
 	// printMatrix()
 	// print the present state of Matrix A to file out
 	private static void printMatrix(int[][] A) {
-		int n = A.length;
 		int m = A[0].length;
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++)
-				System.out.print(A[i][j] + "  ");
-			System.out.println();
-		}
+        for (int[] ints : A) {
+            for (int j = 0; j < m; j++)
+                System.out.print(ints[j] + "  ");
+            System.out.println();
+        }
 		System.out.println();
 		System.out.println();
 	}
@@ -59,8 +58,6 @@ public class Utilities {
 	public static int[][] GaussElimination(int[][] A, int max_row, int max_column) {
 		int row = 0;
 		int column = 0;
-		//int n = 9;
-		//int m = 10;
 		int temp_row;
 		printMatrix(A);
 

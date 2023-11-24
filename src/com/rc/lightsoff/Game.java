@@ -10,16 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Game extends JFrame implements ActionListener {
@@ -38,16 +29,16 @@ public class Game extends JFrame implements ActionListener {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Game frame = new Game();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		EventQueue.invokeLater(() -> {
+            try {
+                Game frame = new Game();
+                frame.setVisible(true);
+            } catch (Exception e) {
+				JOptionPane.showMessageDialog(Game.contentPane,
+					"Exception was thrown: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
 	}
 
 	/**
@@ -56,7 +47,7 @@ public class Game extends JFrame implements ActionListener {
 	public Game() {
 		setTitle("lightsOFF::" + "Main menu");
 		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 400, 400);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
@@ -101,14 +92,9 @@ public class Game extends JFrame implements ActionListener {
 		author.setName("Author");
 		contentPane.add(author, "AUTHOR");
 		author.setLayout(null);
-		
-		JTextArea txtrHiMyName = new JTextArea();
-		txtrHiMyName.setEditable(false);
-		txtrHiMyName.setFont(new Font("Calibri", Font.PLAIN, 16));
-		txtrHiMyName.setLineWrap(true);
-		txtrHiMyName.setText("Hi! My name is Mateusz Lubinski. \r\nI study Computer Science on The State School \r\nof Higher Professional Education in Elbl\u0105g. \r\nMy hobbies are programming, riding on a mountain bike,\r\nrunning, exercising on a gym including calisthenics \r\nbut the foremost i love to eat.");
-		txtrHiMyName.setBounds(0, 0, 374, 310);
-		author.add(txtrHiMyName);
+
+		JTextArea aboutMeTextArea = getAboutMeTextArea();
+		author.add(aboutMeTextArea);
 		
 		JButton btnBack = new JButton("Main menu");
 		btnBack.addActionListener(this);
@@ -119,13 +105,9 @@ public class Game extends JFrame implements ActionListener {
 		aboutGame.setName("About game");
 		contentPane.add(aboutGame, "ABOUTGAME");
 		aboutGame.setLayout(null);
-		
-		JTextArea txtrAbout = new JTextArea();
-		txtrAbout.setEditable(false);
-		txtrAbout.setBounds(0, 0, 374, 310);
-		txtrAbout.setFont(new Font("Calibri", Font.PLAIN, 16));
-		txtrAbout.setText("A one-person game played on a rectangular\r\nlattice of lamps which can be turned \r\non and off. A move consists of flipping \r\na \"switch\" inside one of the squares, \r\nthereby toggling the on/off state of this and \r\nall four vertically and horizontally adjacent \r\nsquares. Starting from a randomly chosen \r\nlight pattern, the aim is to turn all the lamps \r\noff. The problem of determining if it is \r\npossible to start from set of all lights being \r\non to all lights being off is known as the \r\n\"all-ones problem.\"");
-		aboutGame.add(txtrAbout);
+
+		JTextArea gameDescriptionTextArea = getGameDescriptionTextArea();
+		aboutGame.add(gameDescriptionTextArea);
 		
 		JButton btnBack_1 = new JButton("Main menu");
 		btnBack_1.addActionListener(this);
@@ -403,7 +385,26 @@ public class Game extends JFrame implements ActionListener {
 		});
 		
 	}
-	
+
+	private static JTextArea getGameDescriptionTextArea() {
+		JTextArea txtrAbout = new JTextArea();
+		txtrAbout.setEditable(false);
+		txtrAbout.setBounds(0, 0, 374, 310);
+		txtrAbout.setFont(new Font("Calibri", Font.PLAIN, 16));
+		txtrAbout.setText("A one-person game played on a rectangular\r\nlattice of lamps which can be turned \r\non and off. A move consists of flipping \r\na \"switch\" inside one of the squares, \r\nthereby toggling the on/off state of this and \r\nall four vertically and horizontally adjacent \r\nsquares. Starting from a randomly chosen \r\nlight pattern, the aim is to turn all the lamps \r\noff. The problem of determining if it is \r\npossible to start from set of all lights being \r\non to all lights being off is known as the \r\n\"all-ones problem.\"");
+		return txtrAbout;
+	}
+
+	private static JTextArea getAboutMeTextArea() {
+		JTextArea txtrHiMyName = new JTextArea();
+		txtrHiMyName.setEditable(false);
+		txtrHiMyName.setFont(new Font("Calibri", Font.PLAIN, 16));
+		txtrHiMyName.setLineWrap(true);
+		txtrHiMyName.setText("Hi! My name is Mateusz Lubiński. \r\nI study Computer Science on The State School \r\nof Higher Professional Education in Elbląg. \r\nMy hobbies are programming, riding on a mountain bike,\r\nrunning, exercising on a gym including calisthenics \r\nbut the foremost i love to eat.");
+		txtrHiMyName.setBounds(0, 0, 374, 310);
+		return txtrHiMyName;
+	}
+
 	public void actionPerformed(ActionEvent ae) {
 		setTitle("lightsOFF::" + ae.getActionCommand());
 	}

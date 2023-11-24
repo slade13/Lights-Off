@@ -26,9 +26,9 @@ public class PaintPanel3 extends JPanel {
 	// int[][] board = {{0,1,0},{1,1,0},{0,1,1}};
 	int[] vector = new int[9];
 	Rectangle[] rect = new Rectangle[9];
-	Dimension wymiar = new Dimension(100, 100);
-	Point punkt = new Point((getWidth() - wymiar.width * 3) / 2, 5);
-	Point mouseSubtractor = new Point(0, 0);
+	Dimension dimension = new Dimension(100, 100);
+	Point point = new Point((getWidth() - dimension.width * 3) / 2, 5);
+	Point mouseSubtract = new Point(0, 0);
 
 	JButton testBoard;
 
@@ -65,8 +65,8 @@ public class PaintPanel3 extends JPanel {
 		MouseAdapter listener = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				mouseLocation = new Point(e.getPoint().x - mouseSubtractor.x,
-						e.getPoint().y - mouseSubtractor.y);
+				mouseLocation = new Point(e.getPoint().x - mouseSubtract.x,
+						e.getPoint().y - mouseSubtract.y);
 				/*
 				 * System.out.println(e.getPoint().x + " " + e.getPoint().y);
 				 * System.out.println(mouseSubtractor.x + " " +
@@ -117,7 +117,7 @@ public class PaintPanel3 extends JPanel {
 		return temp;
 	}
 
-	public int[] MatrixToVector(int matrix[][]) {
+	public int[] MatrixToVector(int[][] matrix) {
 		int[] tempVector = new int[9];
 		int index = 0;
 		for (int i = 0; i < 3; i++) {
@@ -129,7 +129,7 @@ public class PaintPanel3 extends JPanel {
 		return tempVector;
 	}
 
-	public double[][] VectorToTwoDim(double vector[]) {
+	public double[][] VectorToTwoDim(double[] vector) {
 		double[][] tempVector = new double[9][1];
 		for (int i = 0; i < 9; i++) {
 			tempVector[i][0] = vector[i];
@@ -171,17 +171,17 @@ public class PaintPanel3 extends JPanel {
 
 	public void paintAll(Graphics g) {
 		super.paintComponent(g);
-		punkt = new Point((getWidth() - wymiar.width * 3) / 2, 5);
+		point = new Point((getWidth() - dimension.width * 3) / 2, 5);
 		int index = 0;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				rect[index] = new Rectangle(punkt, wymiar);
+				rect[index] = new Rectangle(point, dimension);
 				vector[index] = board[i][j];
-				punkt.x += wymiar.width;
+				point.x += dimension.width;
 				index++;
 			}
-			punkt.x -= 3 * wymiar.width;
-			punkt.y += wymiar.height;
+			point.x -= 3 * dimension.width;
+			point.y += dimension.height;
 		}
 
 		for (int i = 0; i < 9; i++) {

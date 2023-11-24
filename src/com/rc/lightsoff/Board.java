@@ -18,7 +18,7 @@ public abstract class Board {
 		return randomizedBoard;
 	}
 	
-	public boolean isSolved(int board[][]) {
+	public boolean isSolved(int[][] board) {
 		
 		int size = board[0].length;
 		
@@ -40,18 +40,16 @@ public abstract class Board {
 		return true;
 	}
 	
-	public String toString(int board[][]) {
+	public String toString(int[][] board) {
 		int size=board[0].length;
-		String boardString="";
+		StringBuilder boardString= new StringBuilder();
 		
 		for(int i = 0; i<size; i++) {
 			for(int j = 0; j<size; j++) {
-				boardString += board[i][j] + " ";
+				boardString.append(board[i][j]).append(" ");
 			}
-			boardString += "\n";
+			boardString.append("\n");
 		}
-		return boardString;
+		return boardString.toString();
 	}
-	
-	public abstract int[] returnVector(int[][] board);
 }
