@@ -1,6 +1,4 @@
-package com.rc.lightsoff;
-
-import static com.rc.lightsoff.Utilities.GaussElimination;
+package pl.realcode.lightsoff;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,37 +13,37 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class PaintPanel3 extends JPanel {
+public class PaintPanel5 extends JPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4619705722834246507L;
 	private Point mouseLocation;
-	Board3x3 desk = new Board3x3();
-	int[][] board = desk.randBoard(3);
+	Board5x5 desk = new Board5x5();
+	int[][] board = desk.randBoard(5);
 	// int[][] board = {{0,1,0},{1,1,0},{0,1,1}};
-	int[] vector = new int[9];
-	Rectangle[] rect = new Rectangle[9];
-	Dimension dimension = new Dimension(100, 100);
-	Point point = new Point((getWidth() - dimension.width * 3) / 2, 5);
-	Point mouseSubtract = new Point(0, 0);
+	int[] vector = new int[25];
+	Rectangle[] rect = new Rectangle[25];
+	Dimension wymiar = new Dimension(60, 60);
+	Point punkt = new Point((getWidth() - wymiar.width * 5) / 2, 5);
+	Point mouseSubtractor = new Point(0, 0);
 
 	JButton testBoard;
 
 	// additional variables
-	int[][] arrayA = new int[9][9];
-	int[] vectorB = new int[9];
-	double[] vectorX = new double[9];
+	int[][] arrayA = new int[25][25];
+	int[] vectorB = new int[25];
+	double[] vectorX = new double[25];
 	double[][] solvedArray;
-	int[] helpVector = new int[9];
-	int n = 9;
-	int m = 10;
-	int[][] A = new int[n + 1][m + 1];
+	int[] helpVector = new int[25];
+	int n = 25;
+	int m = 26;
+	int[][] A = new int[n][m];
 	
 	String helpWasUsed = "";
 	boolean helpStatus = false;
 
-	public PaintPanel3() {
+	public PaintPanel5() {
 		BorderFactory.createLineBorder(Color.RED, 5);
 		testBoard = new JButton("help");
 		testBoard.addMouseListener(new MouseAdapter() {
@@ -65,8 +63,8 @@ public class PaintPanel3 extends JPanel {
 		MouseAdapter listener = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				mouseLocation = new Point(e.getPoint().x - mouseSubtract.x,
-						e.getPoint().y - mouseSubtract.y);
+				mouseLocation = new Point(e.getPoint().x - mouseSubtractor.x,
+						e.getPoint().y - mouseSubtractor.y);
 				/*
 				 * System.out.println(e.getPoint().x + " " + e.getPoint().y);
 				 * System.out.println(mouseSubtractor.x + " " +
@@ -76,7 +74,7 @@ public class PaintPanel3 extends JPanel {
 				System.out.println(checkClick());
 				if (checkClick() != -1) {
 					board = lightsOff(checkClick());
-					update();
+					update(); 
 				}
 			}
 		};
@@ -90,7 +88,7 @@ public class PaintPanel3 extends JPanel {
 	}
 
 	private int checkClick() {
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 25; i++) {
 			if (rect[i].x < mouseLocation.x
 					&& rect[i].x + rect[i].width > mouseLocation.x
 					&& rect[i].y < mouseLocation.y
@@ -103,8 +101,8 @@ public class PaintPanel3 extends JPanel {
 
 	private int[][] lightsOff(int clicked) {
 		int[][] temp = board;
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
 				if (desk.boardCombination[clicked][i][j] == 1) {
 					if (temp[i][j] == 0) {
 						temp[i][j] = 1;
@@ -116,75 +114,67 @@ public class PaintPanel3 extends JPanel {
 		}
 		return temp;
 	}
-
-	public int[] MatrixToVector(int[][] matrix) {
-		int[] tempVector = new int[9];
-		int index = 0;
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				tempVector[index] = matrix[i][j];
-				index++;
-			}
-		}
-		return tempVector;
-	}
-
-	public double[][] VectorToTwoDim(double[] vector) {
-		double[][] tempVector = new double[9][1];
-		for (int i = 0; i < 9; i++) {
-			tempVector[i][0] = vector[i];
-		}
-		return tempVector;
-	}
-
+	
 	public void update() {
 		vectorB = MatrixToVector(board);
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 25; i++) {
 			arrayA[i] = MatrixToVector(desk.boardCombination[i]);
 		}
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 10; j++) {
-				if (j != 9) {
+		for (int i = 0; i < 25; i++) {
+			for (int j = 0; j <26; j++) {
+				if (j != 25) {
 					A[i][j] = arrayA[i][j];
 				} else {
 					A[i][j] = vectorB[i];
 				}
 			}
 		}
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 10; j++) {
+		for (int i = 0; i < 25; i++) {
+			for (int j = 0; j < 26; j++) {
 				System.out.print(A[i][j] + " ");
 			}
 			System.out.println();
 		}
 		System.out.println();
-		A = GaussElimination(A, 9, 10);
+		A = Utilities.GaussElimination(A, 25, 26);
 		int helpIndex = 0;
-		for (int i = 1; i <= 9; i++) {
-			helpVector[helpIndex++] = A[i - 1][9];
-			System.out.print(A[i - 1][9] + " ");
-			if (i % 3 == 0)
+		for (int i = 1; i <= 25; i++) {
+			helpVector[helpIndex++] = A[i - 1][25];
+			System.out.print(A[i - 1][25] + " ");
+			if (i % 5 == 0)
 				System.out.println();
 		}
 		repaint();
 	}
-
-	public void paintAll(Graphics g) {
-		super.paintComponent(g);
-		point = new Point((getWidth() - dimension.width * 3) / 2, 5);
+	
+	public int[] MatrixToVector(int matrix[][]) {
+		int[] tempVector = new int[25];
 		int index = 0;
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				rect[index] = new Rectangle(point, dimension);
-				vector[index] = board[i][j];
-				point.x += dimension.width;
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				tempVector[index] = matrix[i][j];
 				index++;
 			}
-			point.x -= 3 * dimension.width;
-			point.y += dimension.height;
+		}
+		return tempVector;
+	}
+	
+	public void paintAll(Graphics g) {
+		super.paintComponent(g);
+		punkt = new Point((getWidth() - wymiar.width * 5) / 2, 5);
+		int index = 0;
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				rect[index] = new Rectangle(punkt, wymiar);
+				vector[index] = board[i][j];
+				punkt.x += wymiar.width;
+				index++;
+			}
+			punkt.x -= 5 * wymiar.width;
+			punkt.y += wymiar.height;
 		}
 
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 25; i++) {
 			g.setColor(Color.RED);
 			g.drawRect(rect[i].x, rect[i].y, rect[i].width, rect[i].height);
 			if (vector[i] == 0) {
@@ -196,11 +186,13 @@ public class PaintPanel3 extends JPanel {
 					g.setColor(Color.WHITE);
 				else
 					g.setColor(Color.BLACK);
-				g.fillOval(rect[i].x + 35, rect[i].y + 35, rect[i].width - 70,
-						rect[i].height - 70);
-
+				g.fillOval(rect[i].x + 20, rect[i].y + 20, rect[i].width - 40,
+						rect[i].height - 40);
+				
 			}
+			//System.out.println(helpVector[i] + " ");
 		}
+		//System.out.println();
 	}
 
 	public void checkIfWon(Graphics g, boolean solved) {
@@ -211,7 +203,7 @@ public class PaintPanel3 extends JPanel {
 					"You won this game!" + helpWasUsed);
 			helpStatus = false;
 			helpWasUsed = "";
-			board = desk.randBoard(3);
+			board = desk.randBoard(5);
 			paintAll(g);
 		}
 	}

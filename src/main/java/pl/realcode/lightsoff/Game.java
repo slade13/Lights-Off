@@ -1,4 +1,4 @@
-package com.rc.lightsoff;
+package pl.realcode.lightsoff;
 
 import java.awt.CardLayout;
 import java.awt.Color;

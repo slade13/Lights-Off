@@ -1,4 +1,4 @@
-package com.rc.lightsoff;
+package pl.realcode.lightsoff;
 
 public class Board3x3 extends Board {
 	int[][][] boardCombination =

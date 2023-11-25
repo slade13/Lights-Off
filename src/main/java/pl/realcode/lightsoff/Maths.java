@@ -1,4 +1,4 @@
-package com.rc.lightsoff;
+package pl.realcode.lightsoff;
 
 public class Maths {
 

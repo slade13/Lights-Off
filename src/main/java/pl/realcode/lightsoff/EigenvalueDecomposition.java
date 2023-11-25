@@ -1,4 +1,4 @@
-package com.rc.lightsoff;
+package pl.realcode.lightsoff;
 
 /** Eigenvalues and eigenvectors of a real matrix. 
 <P>
