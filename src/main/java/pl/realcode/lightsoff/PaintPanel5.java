@@ -198,7 +198,7 @@ public class PaintPanel5 extends JPanel {
 	public void checkIfWon(Graphics g, boolean solved) {
 		if (solved) {
 			// board = desk.randBoard(3);
-			helpWasUsed = helpStatus ? " But you was cheating!" : "";
+			helpWasUsed = helpStatus ? " But you were cheating!" : "";
 			JOptionPane.showMessageDialog(Game.contentPane,
 					"You won this game!" + helpWasUsed);
 			helpStatus = false;

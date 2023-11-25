@@ -44,7 +44,7 @@ public class Utilities {
 
 	// printMatrix()
 	// print the present state of Matrix A to file out
-	private static void printMatrix(int[][] A) {
+	public static void printMatrix(int[][] A) {
 		int m = A[0].length;
         for (int[] ints : A) {
             for (int j = 0; j < m; j++)

@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,20 +20,17 @@ public class PaintPanel3 extends JPanel {
 	private Point mouseLocation;
 	Board3x3 desk = new Board3x3();
 	int[][] board = desk.randBoard(3);
-	// int[][] board = {{0,1,0},{1,1,0},{0,1,1}};
 	int[] vector = new int[9];
 	Rectangle[] rect = new Rectangle[9];
 	Dimension dimension = new Dimension(100, 100);
 	Point point = new Point((getWidth() - dimension.width * 3) / 2, 5);
 	Point mouseSubtract = new Point(0, 0);
 
-	JButton testBoard;
+	JButton helpJButton;
 
 	// additional variables
 	int[][] arrayA = new int[9][9];
 	int[] vectorB = new int[9];
-	double[] vectorX = new double[9];
-	double[][] solvedArray;
 	int[] helpVector = new int[9];
 	int n = 9;
 	int m = 10;
@@ -44,33 +40,23 @@ public class PaintPanel3 extends JPanel {
 	boolean helpStatus = false;
 
 	public PaintPanel3() {
-		BorderFactory.createLineBorder(Color.RED, 5);
-		testBoard = new JButton("help");
-		testBoard.addMouseListener(new MouseAdapter() {
+		helpJButton = new JButton("help");
+		helpJButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				helpStatus = !helpStatus;
-				if (helpStatus)
-					testBoard.setBackground(Color.BLUE);
-				else
-					testBoard.setBackground(Color.GRAY);
 				update();
 			}
 		});
-		testBoard.setBounds(10, 327, 89, 23);
-		add(testBoard);
+		helpJButton.setBounds(10, 327, 89, 23);
+		add(helpJButton);
 
 		MouseAdapter listener = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				mouseLocation = new Point(e.getPoint().x - mouseSubtract.x,
 						e.getPoint().y - mouseSubtract.y);
-				/*
-				 * System.out.println(e.getPoint().x + " " + e.getPoint().y);
-				 * System.out.println(mouseSubtractor.x + " " +
-				 * mouseSubtractor.y); System.out.println(mouseLocation.x + " "
-				 * + mouseLocation.y);
-				 */
+
 				System.out.println(checkClick());
 				if (checkClick() != -1) {
 					board = lightsOff(checkClick());
@@ -127,14 +113,6 @@ public class PaintPanel3 extends JPanel {
 		return tempVector;
 	}
 
-	public double[][] VectorToTwoDim(double[] vector) {
-		double[][] tempVector = new double[9][1];
-		for (int i = 0; i < 9; i++) {
-			tempVector[i][0] = vector[i];
-		}
-		return tempVector;
-	}
-
 	public void update() {
 		vectorB = MatrixToVector(board);
 		for (int i = 0; i < 9; i++) {
@@ -149,14 +127,10 @@ public class PaintPanel3 extends JPanel {
 				}
 			}
 		}
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 10; j++) {
-				System.out.print(A[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-		A = Utilities.GaussElimination(A, 9, 10);
+
+		Utilities.printMatrix(A);
+
+		Utilities.GaussElimination(A, 9, 10);
 		int helpIndex = 0;
 		for (int i = 1; i <= 9; i++) {
 			helpVector[helpIndex++] = A[i - 1][9];
@@ -204,7 +178,7 @@ public class PaintPanel3 extends JPanel {
 	public void checkIfWon(Graphics g, boolean solved) {
 		if (solved) {
 			// board = desk.randBoard(3);
-			helpWasUsed = helpStatus ? " But you was cheating!" : "";
+			helpWasUsed = helpStatus ? " But you were cheating!" : "";
 			JOptionPane.showMessageDialog(Game.contentPane,
 					"You won this game!" + helpWasUsed);
 			helpStatus = false;
