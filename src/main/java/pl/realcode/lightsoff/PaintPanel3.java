@@ -14,12 +14,11 @@ import javax.swing.JPanel;
 
 public class PaintPanel3 extends JPanel {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4619705722834246507L;
 	private Point mouseLocation;
-	Board3x3 desk = new Board3x3();
-	int[][] board = desk.randBoard(3);
+	int[][] board = Board3x3.randBoard(3);
 	int[] vector = new int[9];
 	Rectangle[] rect = new Rectangle[9];
 	Dimension dimension = new Dimension(100, 100);
@@ -32,10 +31,10 @@ public class PaintPanel3 extends JPanel {
 	int[][] arrayA = new int[9][9];
 	int[] vectorB = new int[9];
 	int[] helpVector = new int[9];
-	int n = 9;
-	int m = 10;
-	int[][] A = new int[n + 1][m + 1];
-	
+	int n = 10;
+	int m = 9;
+	int[][] A = new int[m][n];
+
 	String helpWasUsed = "";
 	boolean helpStatus = false;
 
@@ -61,6 +60,7 @@ public class PaintPanel3 extends JPanel {
 				if (checkClick() != -1) {
 					board = lightsOff(checkClick());
 					update();
+					paintAll(getGraphics());
 				}
 			}
 		};
@@ -69,8 +69,8 @@ public class PaintPanel3 extends JPanel {
 
 	@Override
 	protected void paintComponent(Graphics g) {
+		checkIfWon(BoardUtils.isSolved(board));
 		paintAll(g);
-		checkIfWon(g, desk.isSolved(board));
 	}
 
 	private int checkClick() {
@@ -89,7 +89,7 @@ public class PaintPanel3 extends JPanel {
 		int[][] temp = board;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				if (desk.boardCombination[clicked][i][j] == 1) {
+				if (Board3x3.boardCombination[clicked][i][j] == 1) {
 					if (temp[i][j] == 0) {
 						temp[i][j] = 1;
 					} else {
@@ -101,22 +101,12 @@ public class PaintPanel3 extends JPanel {
 		return temp;
 	}
 
-	public int[] MatrixToVector(int[][] matrix) {
-		int[] tempVector = new int[9];
-		int index = 0;
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				tempVector[index] = matrix[i][j];
-				index++;
-			}
-		}
-		return tempVector;
-	}
+
 
 	public void update() {
-		vectorB = MatrixToVector(board);
+		vectorB = BoardUtils.matrixToVector(board);
 		for (int i = 0; i < 9; i++) {
-			arrayA[i] = MatrixToVector(desk.boardCombination[i]);
+			arrayA[i] = BoardUtils.matrixToVector(Board3x3.boardCombination[i]);
 		}
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 10; j++) {
@@ -157,34 +147,35 @@ public class PaintPanel3 extends JPanel {
 		}
 
 		for (int i = 0; i < 9; i++) {
-			g.setColor(Color.RED);
-			g.drawRect(rect[i].x, rect[i].y, rect[i].width, rect[i].height);
+
 			if (vector[i] == 0) {
 				g.setColor(Color.BLACK);
 				g.fillRect(rect[i].x, rect[i].y, rect[i].width, rect[i].height);
 			}
 			if ((helpVector[i] == 1) && helpStatus) {
-				if (vector[i] == 0)
+				if (vector[i] == 0) {
 					g.setColor(Color.WHITE);
-				else
+				}
+				else {
 					g.setColor(Color.BLACK);
-				g.fillOval(rect[i].x + 35, rect[i].y + 35, rect[i].width - 70,
+					g.fillOval(rect[i].x + 35, rect[i].y + 35, rect[i].width - 70,
 						rect[i].height - 70);
+				}
 
 			}
+			g.setColor(Color.GRAY);
+			g.drawRect(rect[i].x, rect[i].y, rect[i].width, rect[i].height);
 		}
 	}
 
-	public void checkIfWon(Graphics g, boolean solved) {
+	public void checkIfWon(boolean solved) {
 		if (solved) {
-			// board = desk.randBoard(3);
 			helpWasUsed = helpStatus ? " But you were cheating!" : "";
 			JOptionPane.showMessageDialog(Game.contentPane,
 					"You won this game!" + helpWasUsed);
 			helpStatus = false;
 			helpWasUsed = "";
-			board = desk.randBoard(3);
-			paintAll(g);
+			board = BoardUtils.randBoard(3);
 		}
 	}
 }

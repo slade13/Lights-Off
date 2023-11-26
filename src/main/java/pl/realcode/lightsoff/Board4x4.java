@@ -1,6 +1,6 @@
 package pl.realcode.lightsoff;
 
-public class Board4x4 extends Board {
+public class Board4x4 extends BoardUtils {
 	int[][][] boardCombination =
 		   {{{1,1,0,0},
 			 {1,0,0,0},
