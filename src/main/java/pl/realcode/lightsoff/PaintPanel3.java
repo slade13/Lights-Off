@@ -17,12 +17,13 @@ public class PaintPanel3 extends JPanel {
 	 *
 	 */
 	private static final long serialVersionUID = -4619705722834246507L;
+	public static final double HELP_CIRCLE_RATIO = 2.85;
 	private Point mouseLocation;
 	int[][] board = Board3x3.randBoard(3);
 	int[] vector = new int[9];
 	Rectangle[] rect = new Rectangle[9];
-	Dimension dimension = new Dimension(100, 100);
-	Point point = new Point((getWidth() - dimension.width * 3) / 2, 5);
+	Dimension squareSize = new Dimension(100, 100);
+	Point point = new Point((getWidth() - squareSize.width * 3) / 2, 5);
 	Point mouseSubtract = new Point(0, 0);
 
 	JButton helpJButton;
@@ -74,7 +75,7 @@ public class PaintPanel3 extends JPanel {
 	}
 
 	private int checkClick() {
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < rect.length; i++) {
 			if (rect[i].x < mouseLocation.x
 					&& rect[i].x + rect[i].width > mouseLocation.x
 					&& rect[i].y < mouseLocation.y
@@ -133,17 +134,17 @@ public class PaintPanel3 extends JPanel {
 
 	public void paintAll(Graphics g) {
 		super.paintComponent(g);
-		point = new Point((getWidth() - dimension.width * 3) / 2, 5);
+		point = new Point((super.getWidth() - squareSize.width * 3) / 2, 5);
 		int index = 0;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				rect[index] = new Rectangle(point, dimension);
+				rect[index] = new Rectangle(point, squareSize);
 				vector[index] = board[i][j];
-				point.x += dimension.width;
+				point.x += squareSize.width;
 				index++;
 			}
-			point.x -= 3 * dimension.width;
-			point.y += dimension.height;
+			point.x -= 3 * squareSize.width;
+			point.y += squareSize.height;
 		}
 
 		for (int i = 0; i < 9; i++) {
@@ -158,9 +159,11 @@ public class PaintPanel3 extends JPanel {
 				}
 				else {
 					g.setColor(Color.BLACK);
-					g.fillOval(rect[i].x + 35, rect[i].y + 35, rect[i].width - 70,
-						rect[i].height - 70);
 				}
+				g.fillOval((int) (rect[i].x + rect[i].width/HELP_CIRCLE_RATIO),
+                    (int) (rect[i].y +  rect[i].height/HELP_CIRCLE_RATIO),
+                    (int) (rect[i].width/HELP_CIRCLE_RATIO),
+                    (int) (rect[i].height/HELP_CIRCLE_RATIO));
 
 			}
 			g.setColor(Color.GRAY);
@@ -170,11 +173,11 @@ public class PaintPanel3 extends JPanel {
 
 	public void checkIfWon(boolean solved) {
 		if (solved) {
+			String message = "You won!";
 			helpWasUsed = helpStatus ? " But you were cheating!" : "";
 			JOptionPane.showMessageDialog(Game.contentPane,
-					"You won this game!" + helpWasUsed);
+					 message);
 			helpStatus = false;
-			helpWasUsed = "";
 			board = BoardUtils.randBoard(3);
 		}
 	}
