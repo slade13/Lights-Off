@@ -19,9 +19,12 @@ public class PaintPanel3 extends JPanel {
 	private static final long serialVersionUID = -4619705722834246507L;
 	public static final double HELP_CIRCLE_RATIO = 2.85;
 	private Point mouseLocation;
+
+	private static final int n = 10;
+	private static final int m = 9;
 	int[][] board = Board3x3.randBoard(3);
-	int[] vector = new int[9];
-	Rectangle[] rect = new Rectangle[9];
+	int[] vector = new int[m];
+	Rectangle[] rect = new Rectangle[m];
 	Dimension squareSize = new Dimension(100, 100);
 	Point point = new Point((getWidth() - squareSize.width * 3) / 2, 5);
 	Point mouseSubtract = new Point(0, 0);
@@ -29,14 +32,12 @@ public class PaintPanel3 extends JPanel {
 	JButton helpJButton;
 
 	// additional variables
-	int[][] arrayA = new int[9][9];
-	int[] vectorB = new int[9];
-	int[] helpVector = new int[9];
-	int n = 10;
-	int m = 9;
+	int[][] arrayA = new int[m][m];
+	int[] vectorB = new int[m];
+	int[] helpVector = new int[m];
+
 	int[][] A = new int[m][n];
 
-	String helpWasUsed = "";
 	boolean helpStatus = false;
 
 	public PaintPanel3() {
@@ -70,7 +71,7 @@ public class PaintPanel3 extends JPanel {
 
 	@Override
 	protected void paintComponent(Graphics g) {
-		checkIfWon(BoardUtils.isSolved(board));
+		checkIfWon();
 		paintAll(g);
 	}
 
@@ -106,12 +107,12 @@ public class PaintPanel3 extends JPanel {
 
 	public void update() {
 		vectorB = BoardUtils.matrixToVector(board);
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < arrayA.length; i++) {
 			arrayA[i] = BoardUtils.matrixToVector(Board3x3.boardCombination[i]);
 		}
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 10; j++) {
-				if (j != 9) {
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				if (j != m) {
 					A[i][j] = arrayA[i][j];
 				} else {
 					A[i][j] = vectorB[i];
@@ -121,11 +122,11 @@ public class PaintPanel3 extends JPanel {
 
 		Utilities.printMatrix(A);
 
-		Utilities.GaussElimination(A, 9, 10);
+		Utilities.GaussElimination(A, m, n);
 		int helpIndex = 0;
-		for (int i = 1; i <= 9; i++) {
-			helpVector[helpIndex++] = A[i - 1][9];
-			System.out.print(A[i - 1][9] + " ");
+		for (int i = 1; i <= m; i++) {
+			helpVector[helpIndex++] = A[i - 1][m];
+			System.out.print(A[i - 1][m] + " ");
 			if (i % 3 == 0)
 				System.out.println();
 		}
@@ -147,7 +148,7 @@ public class PaintPanel3 extends JPanel {
 			point.y += squareSize.height;
 		}
 
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < m; i++) {
 
 			if (vector[i] == 0) {
 				g.setColor(Color.BLACK);
@@ -160,8 +161,9 @@ public class PaintPanel3 extends JPanel {
 				else {
 					g.setColor(Color.BLACK);
 				}
-				g.fillOval((int) (rect[i].x + rect[i].width/HELP_CIRCLE_RATIO),
-                    (int) (rect[i].y +  rect[i].height/HELP_CIRCLE_RATIO),
+				g.fillOval(
+					(int) (rect[i].x + rect[i].width/HELP_CIRCLE_RATIO),
+                    (int) (rect[i].y + rect[i].height/HELP_CIRCLE_RATIO),
                     (int) (rect[i].width/HELP_CIRCLE_RATIO),
                     (int) (rect[i].height/HELP_CIRCLE_RATIO));
 
@@ -171,10 +173,11 @@ public class PaintPanel3 extends JPanel {
 		}
 	}
 
-	public void checkIfWon(boolean solved) {
+	public void checkIfWon() {
+		boolean solved = BoardUtils.isSolved(board);
 		if (solved) {
 			String message = "You won!";
-			helpWasUsed = helpStatus ? " But you were cheating!" : "";
+			message += helpStatus ? " But you were cheating!" : "";
 			JOptionPane.showMessageDialog(Game.contentPane,
 					 message);
 			helpStatus = false;
