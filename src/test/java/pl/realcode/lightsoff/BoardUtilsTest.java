@@ -38,7 +38,7 @@ class BoardUtilsTest {
     void generatedBoardsAreSolvable() {
         for (int size = 3; size <= 5; size++) {
             for (int attempt = 0; attempt < 100; attempt++) {
-                int[][] board = BoardUtils.randBoard(size);
+                int[][] board = BoardUtils.randomSolvableBoard(size);
 
                 assertFalse(BoardUtils.isSolved(board));
                 assertNotNull(BoardUtils.solve(board));

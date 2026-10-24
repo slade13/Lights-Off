@@ -218,53 +218,17 @@ public class Game extends JFrame implements ActionListener {
 		tutorial.setName("Tutorial");
 		contentPane.add(tutorial, "TUTORIAL");		
 		
-		PaintPanel3 gameplayScreen3 = new PaintPanel3();
-		gameplayScreen3.setBackground(Color.WHITE);
-		gameplayScreen3.setBorder(null);
-		gameplayScreen3.setLayout(null);
+		GamePanel gameplayScreen3 = new GamePanel(3, "Easy", () -> showCard("STARTGAME"));
 		gameplayScreen3.setName("Game Easy");
 		contentPane.add(gameplayScreen3, "GAMEPLAYEASY");
-		
-		JLabel lblEasy = new JLabel("Easy");
-		lblEasy.setBounds(194, 317, 46, 14);
-		gameplayScreen3.add(lblEasy);
-		
-		JButton btnBack_5 = new JButton("Back");
-		btnBack_5.addActionListener(this);
-		btnBack_5.setBounds(285, 327, 89, 23);
-		gameplayScreen3.add(btnBack_5);
-		
-		PaintPanel4 gameplayScreen4 = new PaintPanel4();
-		gameplayScreen4.setBackground(Color.WHITE);
-		gameplayScreen4.setBorder(null);
-		gameplayScreen4.setLayout(null);
+
+		GamePanel gameplayScreen4 = new GamePanel(4, "Medium", () -> showCard("STARTGAME"));
 		gameplayScreen4.setName("Game Medium");
 		contentPane.add(gameplayScreen4, "GAMEPLAYMEDIUM");
-		
-		JLabel lblMedium = new JLabel("Medium");
-		lblMedium.setBounds(170, 324, 46, 14);
-		gameplayScreen4.add(lblMedium);
-		
-		JButton btnBack_4 = new JButton("Back");
-		btnBack_4.addActionListener(this);
-		btnBack_4.setBounds(285, 327, 89, 23);
-		gameplayScreen4.add(btnBack_4);
-		
-		PaintPanel5 gameplayScreen5 = new PaintPanel5();
-		gameplayScreen5.setBackground(Color.WHITE);
-		gameplayScreen5.setBorder(null);
-		gameplayScreen5.setLayout(null);
+
+		GamePanel gameplayScreen5 = new GamePanel(5, "Hard", () -> showCard("STARTGAME"));
 		gameplayScreen5.setName("Game Hardcore");
 		contentPane.add(gameplayScreen5, "GAMEPLAYHARD");
-		
-		JLabel lblHard = new JLabel("Hard");
-		lblHard.setBounds(164, 321, 46, 14);
-		gameplayScreen5.add(lblHard);
-		
-		JButton btnBack_3 = new JButton("Back");
-		btnBack_3.addActionListener(this);
-		btnBack_3.setBounds(285, 327, 89, 23);
-		gameplayScreen5.add(btnBack_3);
 		
 		// Main menu buttons
 		
@@ -327,7 +291,11 @@ public class Game extends JFrame implements ActionListener {
 			cardName = diffGroup.getSelection().getActionCommand();
 		}
 		if (cardName != null) {
-			((CardLayout) getContentPane().getLayout()).show(getContentPane(), cardName);
+			showCard(cardName);
 		}
+	}
+
+	private void showCard(String cardName) {
+		((CardLayout) getContentPane().getLayout()).show(getContentPane(), cardName);
 	}
 }

@@ -16,12 +16,6 @@ public final class BoardUtils {
         return randomSolvableBoard(size, new Random());
     }
 
-    /** @deprecated use {@link #randomSolvableBoard(int)} */
-    @Deprecated
-    public static int[][] randBoard(int size) {
-        return randomSolvableBoard(size);
-    }
-
     static int[][] randomSolvableBoard(int size, Random random) {
         if (size < 1) {
             throw new IllegalArgumentException("Board size must be positive");
