@@ -116,34 +116,8 @@ public class PaintPanel5 extends JPanel {
 	}
 	
 	public void update() {
-		vectorB = MatrixToVector(board);
-		for (int i = 0; i < 25; i++) {
-			arrayA[i] = MatrixToVector(desk.boardCombination[i]);
-		}
-		for (int i = 0; i < 25; i++) {
-			for (int j = 0; j <26; j++) {
-				if (j != 25) {
-					A[i][j] = arrayA[i][j];
-				} else {
-					A[i][j] = vectorB[i];
-				}
-			}
-		}
-		for (int i = 0; i < 25; i++) {
-			for (int j = 0; j < 26; j++) {
-				System.out.print(A[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
-		A = Utilities.GaussElimination(A, 25, 26);
-		int helpIndex = 0;
-		for (int i = 1; i <= 25; i++) {
-			helpVector[helpIndex++] = A[i - 1][25];
-			System.out.print(A[i - 1][25] + " ");
-			if (i % 5 == 0)
-				System.out.println();
-		}
+		int[] solution = BoardUtils.solve(board);
+		helpVector = solution == null ? new int[25] : solution;
 		repaint();
 	}
 	

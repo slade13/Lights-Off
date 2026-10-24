@@ -59,11 +59,10 @@ public class PaintPanel3 extends JPanel {
 						e.getPoint().y - mouseSubtract.y);
 
 				System.out.println(checkClick());
-				if (checkClick() != -1) {
-					board = lightsOff(checkClick());
-					update();
-					paintAll(getGraphics());
-				}
+					if (checkClick() != -1) {
+						board = lightsOff(checkClick());
+						update();
+					}
 			}
 		};
 		addMouseListener(listener);
@@ -106,30 +105,8 @@ public class PaintPanel3 extends JPanel {
 
 
 	public void update() {
-		vectorB = BoardUtils.matrixToVector(board);
-		for (int i = 0; i < arrayA.length; i++) {
-			arrayA[i] = BoardUtils.matrixToVector(Board3x3.boardCombination[i]);
-		}
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (j != m) {
-					A[i][j] = arrayA[i][j];
-				} else {
-					A[i][j] = vectorB[i];
-				}
-			}
-		}
-
-		Utilities.printMatrix(A);
-
-		Utilities.GaussElimination(A, m, n);
-		int helpIndex = 0;
-		for (int i = 1; i <= m; i++) {
-			helpVector[helpIndex++] = A[i - 1][m];
-			System.out.print(A[i - 1][m] + " ");
-			if (i % 3 == 0)
-				System.out.println();
-		}
+		int[] solution = BoardUtils.solve(board);
+		helpVector = solution == null ? new int[m] : solution;
 		repaint();
 	}
 

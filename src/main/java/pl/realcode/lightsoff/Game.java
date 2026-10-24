@@ -151,6 +151,7 @@ public class Game extends JFrame implements ActionListener {
 		diffGroup.add(diffHard);
 		
 		JButton btnLetTheGame = new JButton("Let the game begin...");
+		btnLetTheGame.addActionListener(this);
 		btnLetTheGame.setForeground(Color.WHITE);
 		btnLetTheGame.setBackground(Color.BLACK);
 		btnLetTheGame.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -221,6 +222,7 @@ public class Game extends JFrame implements ActionListener {
 		gameplayScreen3.add(lblEasy);
 		
 		JButton btnBack_5 = new JButton("Back");
+		btnBack_5.addActionListener(this);
 		btnBack_5.setBounds(285, 327, 89, 23);
 		gameplayScreen3.add(btnBack_5);
 		
@@ -236,6 +238,7 @@ public class Game extends JFrame implements ActionListener {
 		gameplayScreen4.add(lblMedium);
 		
 		JButton btnBack_4 = new JButton("Back");
+		btnBack_4.addActionListener(this);
 		btnBack_4.setBounds(285, 327, 89, 23);
 		gameplayScreen4.add(btnBack_4);
 		
@@ -251,6 +254,7 @@ public class Game extends JFrame implements ActionListener {
 		gameplayScreen5.add(lblHard);
 		
 		JButton btnBack_3 = new JButton("Back");
+		btnBack_3.addActionListener(this);
 		btnBack_3.setBounds(285, 327, 89, 23);
 		gameplayScreen5.add(btnBack_3);
 		
@@ -271,116 +275,6 @@ public class Game extends JFrame implements ActionListener {
 					lblLightsOffGame.setForeground(Color.BLACK);
 					isLightOn=true;
 				}
-			}
-		});
-		
-		// "Start game"
-		btnStartGame.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "STARTGAME" );
-			}
-		});
-		
-		// "Tutorial"
-		btnTutorial.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "TUTORIAL" );
-			}
-		});
-		
-		// "About game"
-		btnAboutGame.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "ABOUTGAME" );
-			}
-		});
-		
-		// "Author"
-		btnAuthor.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "AUTHOR" );
-			}
-		});
-		
-		// Specific Cards
-		
-		// Author button - "Back"
-		btnBack.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "MENU" );
-			}
-		});
-		
-		// About game button - "Back"
-
-		btnBack_1.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "MENU" );
-			}
-		});
-		
-		// Tutorial button - "Back"
-		tutorialBackButton.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "MENU" );
-			}
-		});
-		
-		// Start game - "Back"
-		btnBack_2.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "MENU" );
-			}
-		});
-		
-		// Start game - "start"
-		btnLetTheGame.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				String gameScreen = diffGroup.getSelection().getActionCommand();
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), gameScreen );
-			}
-		});
-		
-		// Events for game
-		//HARD
-		btnBack_3.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "STARTGAME" );
-			}
-		});
-		//MEDIUM
-		btnBack_4.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "STARTGAME" );
-			}
-		});
-		//EASY
-		btnBack_5.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				CardLayout card = (CardLayout) getContentPane().getLayout();
-				card.show( getContentPane(), "STARTGAME" );
 			}
 		});
 		
@@ -407,5 +301,25 @@ public class Game extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent ae) {
 		setTitle("lightsOFF::" + ae.getActionCommand());
+		String command = ae.getActionCommand();
+		String cardName = null;
+		if ("Start game".equals(command)) {
+			cardName = "STARTGAME";
+		} else if ("Tutorial".equals(command)) {
+			cardName = "TUTORIAL";
+		} else if ("About game".equals(command)) {
+			cardName = "ABOUTGAME";
+		} else if ("Author".equals(command)) {
+			cardName = "AUTHOR";
+		} else if ("Main menu".equals(command)) {
+			cardName = "MENU";
+		} else if ("Back".equals(command)) {
+			cardName = "STARTGAME";
+		} else if ("Let the game begin...".equals(command)) {
+			cardName = diffGroup.getSelection().getActionCommand();
+		}
+		if (cardName != null) {
+			((CardLayout) getContentPane().getLayout()).show(getContentPane(), cardName);
+		}
 	}
 }
