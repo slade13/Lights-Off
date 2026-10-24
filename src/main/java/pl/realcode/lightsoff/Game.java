@@ -1,201 +1,177 @@
 package pl.realcode.lightsoff;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.net.URL;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
-public final class Game extends JFrame {
+import java.io.InputStream;
 
-    private static final long serialVersionUID = 1L;
-    private static final String MENU = "MENU";
-    private static final String DIFFICULTY = "DIFFICULTY";
-    private static final String TUTORIAL = "TUTORIAL";
-    private static final String ABOUT = "ABOUT";
-    private static final String AUTHOR = "AUTHOR";
-    private static final String EASY = "EASY";
-    private static final String MEDIUM = "MEDIUM";
-    private static final String HARD = "HARD";
+public final class Game extends Application {
+    private static final double WINDOW_WIDTH = 520;
+    private static final double WINDOW_HEIGHT = 620;
 
-    private final CardLayout cardLayout = new CardLayout();
-    private final JPanel cards = new JPanel(cardLayout);
+    private Stage stage;
+    private Scene scene;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new Game().setVisible(true);
-            } catch (RuntimeException exception) {
-                JOptionPane.showMessageDialog(null,
-                        "Unable to start the game: " + exception.getMessage(),
-                        "Lights Off", JOptionPane.ERROR_MESSAGE);
-            }
+    @Override
+    public void start(Stage primaryStage) {
+        stage = primaryStage;
+        scene = new Scene(createMainMenu(), WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.getStylesheets().add(requireResource("/styles/game.css"));
+        stage.setTitle("Lights Off — Main menu");
+        stage.setScene(scene);
+        stage.setMinWidth(420);
+        stage.setMinHeight(520);
+        stage.show();
+    }
+
+    private VBox createMainMenu() {
+        Label title = new Label("LIGHTS OFF");
+        title.getStyleClass().add("app-title");
+        Label subtitle = new Label("Turn every light off");
+        subtitle.getStyleClass().add("subtitle");
+
+        VBox menu = new VBox(14, title, subtitle, spacer(18),
+                navigationButton("Start game", this::showDifficulty),
+                navigationButton("Tutorial", this::showTutorial),
+                navigationButton("About game", () -> showTextScreen("About game", gameDescription())),
+                navigationButton("Author", () -> showTextScreen("Author", authorDescription())));
+        menu.setAlignment(Pos.CENTER);
+        menu.setPadding(new Insets(45));
+        menu.getStyleClass().addAll("screen", "dark-screen");
+        return menu;
+    }
+
+    private void showDifficulty() {
+        Label title = new Label("Choose difficulty");
+        title.getStyleClass().add("screen-title");
+        ToggleGroup difficulties = new ToggleGroup();
+        RadioButton easy = difficultyOption("Easy — 3×3", 3, difficulties, true);
+        RadioButton medium = difficultyOption("Medium — 4×4", 4, difficulties, false);
+        RadioButton hard = difficultyOption("Hard — 5×5", 5, difficulties, false);
+
+        Button start = navigationButton("Start game", () -> {
+            RadioButton selected = (RadioButton) difficulties.getSelectedToggle();
+            int size = (int) selected.getUserData();
+            showGame(size, difficultyName(size));
         });
+        VBox content = new VBox(18, title, spacer(10), easy, medium, hard,
+                spacer(22), start, secondaryButton("Main menu", this::showMainMenu));
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(45));
+        content.getStyleClass().addAll("screen", "dark-screen");
+        show(content, "Choose difficulty");
     }
 
-    public Game() {
-        super("lightsOFF::Main menu");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setResizable(false);
-        setSize(400, 400);
-        setLocationRelativeTo(null);
-
-        cards.add(createMainMenu(), MENU);
-        cards.add(createDifficultyScreen(), DIFFICULTY);
-        cards.add(createTutorial(), TUTORIAL);
-        cards.add(createTextScreen("About game", gameDescription()), ABOUT);
-        cards.add(createTextScreen("Author", authorDescription()), AUTHOR);
-        cards.add(new GamePanel(3, "Easy", () -> showCard(DIFFICULTY, "Start game")), EASY);
-        cards.add(new GamePanel(4, "Medium", () -> showCard(DIFFICULTY, "Start game")), MEDIUM);
-        cards.add(new GamePanel(5, "Hard", () -> showCard(DIFFICULTY, "Start game")), HARD);
-        setContentPane(cards);
+    private void showGame(int size, String difficulty) {
+        show(new GamePanel(size, difficulty, this::showDifficulty), difficulty);
     }
 
-    private JPanel createMainMenu() {
-        JPanel panel = verticalPanel(Color.BLACK);
-        panel.setBorder(BorderFactory.createEmptyBorder(25, 70, 25, 70));
+    private void showTutorial() {
+        VBox steps = new VBox(22);
+        steps.setAlignment(Pos.CENTER);
+        steps.setPadding(new Insets(24));
+        steps.getStyleClass().add("tutorial-content");
+        Label title = new Label("How to play");
+        title.getStyleClass().add("screen-title");
+        steps.getChildren().add(title);
+        addTutorialStep(steps, "/Images/1.png", "Example of a 3×3 puzzle");
+        addTutorialStep(steps, "/Images/11.png", "Step 1");
+        addTutorialStep(steps, "/Images/21.png", "Step 2");
+        addTutorialStep(steps, "/Images/31.png", "Step 3");
+        addTutorialStep(steps, "/Images/41.png", "Step 4");
+        addTutorialStep(steps, "/Images/5.png", "Solved puzzle");
+        addTutorialStep(steps, "/Images/animacja.gif", "Animated solution");
+        steps.getChildren().add(secondaryButton("Main menu", this::showMainMenu));
 
-        JLabel title = new JLabel("Lights Off Game", SwingConstants.CENTER);
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 29));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(title);
-        panel.add(Box.createVerticalStrut(20));
-        panel.add(menuButton("Start game", () -> showCard(DIFFICULTY, "Start game")));
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(menuButton("Tutorial", () -> showCard(TUTORIAL, "Tutorial")));
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(menuButton("About game", () -> showCard(ABOUT, "About game")));
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(menuButton("Author", () -> showCard(AUTHOR, "Author")));
-        return panel;
+        ScrollPane scrollPane = new ScrollPane(steps);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("screen");
+        show(scrollPane, "Tutorial");
     }
 
-    private JPanel createDifficultyScreen() {
-        JPanel panel = verticalPanel(Color.BLACK);
-        panel.setBorder(BorderFactory.createEmptyBorder(35, 80, 25, 80));
-
-        JLabel label = new JLabel("Difficulty:");
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 17));
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(label);
-        panel.add(Box.createVerticalStrut(10));
-
-        ButtonGroup group = new ButtonGroup();
-        JRadioButton easy = difficultyOption("Easy", EASY, true, group);
-        JRadioButton medium = difficultyOption("Medium", MEDIUM, false, group);
-        JRadioButton hard = difficultyOption("Hard", HARD, false, group);
-        panel.add(easy);
-        panel.add(medium);
-        panel.add(hard);
-        panel.add(Box.createVerticalGlue());
-
-        JButton start = menuButton("Let the game begin...",
-                () -> showCard(group.getSelection().getActionCommand(), "Game"));
-        panel.add(start);
-        panel.add(Box.createVerticalStrut(12));
-        panel.add(menuButton("Main menu", () -> showCard(MENU, "Main menu")));
-        return panel;
+    private void showTextScreen(String titleText, String body) {
+        Label title = new Label(titleText);
+        title.getStyleClass().add("screen-title");
+        Text text = new Text(body);
+        text.getStyleClass().add("body-text");
+        text.wrappingWidthProperty().bind(scene.widthProperty().subtract(100));
+        VBox content = new VBox(28, title, text, secondaryButton("Main menu", this::showMainMenu));
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(50));
+        content.getStyleClass().add("screen");
+        show(content, titleText);
     }
 
-    private JScrollPane createTutorial() {
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        addTutorialStep(content, "/Images/1.png", "Example of solving 3x3 puzzle");
-        addTutorialStep(content, "/Images/11.png", "Step 1");
-        addTutorialStep(content, "/Images/21.png", "Step 2");
-        addTutorialStep(content, "/Images/31.png", "Step 3");
-        addTutorialStep(content, "/Images/41.png", "Step 4");
-        addTutorialStep(content, "/Images/5.png", "Solved puzzle");
-        addTutorialStep(content, "/Images/animacja.gif", "Animation of the solution");
-
-        JButton back = menuButton("Main menu", () -> showCard(MENU, "Main menu"));
-        content.add(back);
-        return new JScrollPane(content);
+    private void showMainMenu() {
+        show(createMainMenu(), "Main menu");
     }
 
-    private JPanel createTextScreen(String heading, String text) {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-
-        JLabel title = new JLabel(heading, SwingConstants.CENTER);
-        title.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-        panel.add(title, BorderLayout.NORTH);
-
-        JTextArea textArea = new JTextArea(text);
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 15));
-        textArea.setBackground(panel.getBackground());
-        panel.add(textArea, BorderLayout.CENTER);
-
-        JButton back = new JButton("Main menu");
-        back.addActionListener(event -> showCard(MENU, "Main menu"));
-        panel.add(back, BorderLayout.SOUTH);
-        return panel;
+    private void show(Region root, String title) {
+        scene.setRoot(root);
+        stage.setTitle("Lights Off — " + title);
     }
 
-    private static JPanel verticalPanel(Color background) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(background);
-        return panel;
-    }
-
-    private static JButton menuButton(String text, Runnable action) {
-        JButton button = new JButton(text);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(240, 42));
-        button.setForeground(Color.BLACK);
-        button.setBackground(Color.WHITE);
-        button.addActionListener(event -> action.run());
+    private static Button navigationButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("primary-button");
+        button.setMaxWidth(250);
+        button.setOnAction(event -> action.run());
         return button;
     }
 
-    private static JRadioButton difficultyOption(String text, String command,
-                                                  boolean selected, ButtonGroup group) {
-        JRadioButton button = new JRadioButton(text, selected);
-        button.setActionCommand(command);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setForeground(Color.WHITE);
-        button.setBackground(Color.BLACK);
-        group.add(button);
+    private static Button secondaryButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("secondary-button");
+        button.setOnAction(event -> action.run());
         return button;
     }
 
-    private static void addTutorialStep(JPanel parent, String resource, String description) {
-        URL imageUrl = Game.class.getResource(resource);
-        JLabel label = new JLabel(description,
-                imageUrl == null ? null : new ImageIcon(imageUrl), SwingConstants.CENTER);
-        label.setVerticalTextPosition(SwingConstants.TOP);
-        label.setHorizontalTextPosition(SwingConstants.CENTER);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        parent.add(label);
+    private static RadioButton difficultyOption(String text, int size, ToggleGroup group,
+                                                boolean selected) {
+        RadioButton button = new RadioButton(text);
+        button.setUserData(size);
+        button.setToggleGroup(group);
+        button.setSelected(selected);
+        button.getStyleClass().add("difficulty-option");
+        return button;
     }
 
-    private void showCard(String card, String title) {
-        cardLayout.show(cards, card);
-        setTitle("lightsOFF::" + title);
+    private static void addTutorialStep(VBox parent, String resource, String description) {
+        InputStream stream = Game.class.getResourceAsStream(resource);
+        if (stream == null) {
+            return;
+        }
+        ImageView imageView = new ImageView(new Image(stream));
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(320);
+        Label label = new Label(description);
+        label.getStyleClass().add("tutorial-label");
+        VBox step = new VBox(8, label, imageView);
+        step.setAlignment(Pos.CENTER);
+        parent.getChildren().add(step);
+    }
+
+    private static Region spacer(double height) {
+        Region spacer = new Region();
+        spacer.setMinHeight(height);
+        return spacer;
+    }
+
+    private static String difficultyName(int size) {
+        return size == 3 ? "Easy" : size == 4 ? "Medium" : "Hard";
     }
 
     private static String gameDescription() {
@@ -207,5 +183,12 @@ public final class Game extends JFrame {
     private static String authorDescription() {
         return "Created by Mateusz Lubiński as a computer science project. "
                 + "The hint system solves the puzzle using Gaussian elimination over GF(2).";
+    }
+
+    private static String requireResource(String path) {
+        if (Game.class.getResource(path) == null) {
+            throw new IllegalStateException("Missing resource: " + path);
+        }
+        return Game.class.getResource(path).toExternalForm();
     }
 }

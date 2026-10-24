@@ -1,59 +1,102 @@
 package pl.realcode.lightsoff;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javafx.animation.PauseTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
+import javafx.util.Duration;
 
-/** Reusable game view for every supported board size. */
-public final class GamePanel extends JPanel {
-
-    private static final int BOARD_PIXELS = 300;
-    private static final Color GRID_COLOR = Color.GRAY;
+/** Reusable JavaFX game view for every supported board size. */
+public final class GamePanel extends BorderPane {
+    private static final double BOARD_SIZE = 400;
 
     private final LightsOutBoard board;
-    private final BoardCanvas canvas = new BoardCanvas();
-    private final JButton hintButton = new JButton("Show hints");
+    private final Button[][] cells;
+    private final Button hintButton = new Button("Show hints");
+    private final GridPane grid = new GridPane();
 
     private boolean hintsVisible;
     private boolean hintsUsed;
     private int[] solution;
 
-    public GamePanel(int size, String difficultyName, Runnable onBack) {
+    public GamePanel(int size, String difficulty, Runnable onBack) {
         board = new LightsOutBoard(size);
-        setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
-
-        JLabel difficultyLabel = new JLabel(difficultyName, SwingConstants.CENTER);
-        add(difficultyLabel, BorderLayout.NORTH);
-        add(canvas, BorderLayout.CENTER);
-        add(createControls(onBack), BorderLayout.SOUTH);
+        cells = new Button[size][size];
+        getStyleClass().add("game-screen");
+        setPadding(new Insets(24));
+        setTop(createHeading(difficulty));
+        setCenter(createBoard());
+        setBottom(createControls(onBack));
+        renderBoard();
     }
 
-    private JPanel createControls(Runnable onBack) {
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
-        controls.setBackground(Color.WHITE);
+    private Label createHeading(String difficulty) {
+        Label heading = new Label(difficulty + " — " + board.getSize() + "×" + board.getSize());
+        heading.getStyleClass().add("screen-title");
+        BorderPane.setAlignment(heading, Pos.CENTER);
+        BorderPane.setMargin(heading, new Insets(0, 0, 18, 0));
+        return heading;
+    }
 
-        hintButton.addActionListener(event -> toggleHints());
-        controls.add(hintButton);
+    private GridPane createBoard() {
+        grid.setAlignment(Pos.CENTER);
+        grid.setMaxSize(BOARD_SIZE, BOARD_SIZE);
+        grid.setPrefSize(BOARD_SIZE, BOARD_SIZE);
+        grid.getStyleClass().add("board");
+        for (int index = 0; index < board.getSize(); index++) {
+            ColumnConstraints column = new ColumnConstraints();
+            column.setPercentWidth(100.0 / board.getSize());
+            column.setHgrow(Priority.ALWAYS);
+            grid.getColumnConstraints().add(column);
+            RowConstraints row = new RowConstraints();
+            row.setPercentHeight(100.0 / board.getSize());
+            row.setVgrow(Priority.ALWAYS);
+            grid.getRowConstraints().add(row);
+        }
+        for (int row = 0; row < board.getSize(); row++) {
+            for (int column = 0; column < board.getSize(); column++) {
+                Button cell = new Button();
+                cell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                cell.getStyleClass().add("board-cell");
+                int selectedRow = row;
+                int selectedColumn = column;
+                cell.setOnAction(event -> pressCell(selectedRow, selectedColumn));
+                cells[row][column] = cell;
+                grid.add(cell, column, row);
+            }
+        }
+        return grid;
+    }
 
-        JButton backButton = new JButton("Back");
-        backButton.addActionListener(event -> onBack.run());
-        controls.add(backButton);
+    private HBox createControls(Runnable onBack) {
+        hintButton.getStyleClass().add("secondary-button");
+        hintButton.setOnAction(event -> toggleHints());
+        Button backButton = new Button("Back");
+        backButton.getStyleClass().add("secondary-button");
+        backButton.setOnAction(event -> onBack.run());
+        HBox controls = new HBox(16, hintButton, backButton);
+        controls.setAlignment(Pos.CENTER);
+        BorderPane.setMargin(controls, new Insets(20, 0, 0, 0));
         return controls;
+    }
+
+    private void pressCell(int row, int column) {
+        board.press(row, column);
+        solution = hintsVisible ? board.findSolution() : null;
+        renderBoard();
+        if (board.isSolved()) {
+            PauseTransition pause = new PauseTransition(Duration.millis(180));
+            pause.setOnFinished(event -> finishGame());
+            pause.play();
+        }
     }
 
     private void toggleHints() {
@@ -61,100 +104,34 @@ public final class GamePanel extends JPanel {
         hintsUsed |= hintsVisible;
         solution = hintsVisible ? board.findSolution() : null;
         hintButton.setText(hintsVisible ? "Hide hints" : "Show hints");
-        canvas.repaint();
+        renderBoard();
     }
 
-    private void pressCell(int row, int column) {
-        board.press(row, column);
-        solution = hintsVisible ? board.findSolution() : null;
-        canvas.repaint();
-
-        if (board.isSolved()) {
-            SwingUtilities.invokeLater(this::finishGame);
+    private void renderBoard() {
+        for (int row = 0; row < board.getSize(); row++) {
+            for (int column = 0; column < board.getSize(); column++) {
+                Button cell = cells[row][column];
+                cell.getStyleClass().removeAll("light-on", "light-off", "hint");
+                cell.getStyleClass().add(board.isLightOn(row, column) ? "light-on" : "light-off");
+                int index = row * board.getSize() + column;
+                if (hintsVisible && solution != null && solution[index] == 1) {
+                    cell.getStyleClass().add("hint");
+                }
+            }
         }
     }
 
     private void finishGame() {
-        String message = hintsUsed ? "You won! But you used hints." : "You won!";
-        JOptionPane.showMessageDialog(this, message);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Lights Off");
+        alert.setHeaderText("You won!");
+        alert.setContentText(hintsUsed ? "Puzzle solved with hints." : "Puzzle solved without hints.");
+        alert.showAndWait();
         board.reset();
         hintsVisible = false;
         hintsUsed = false;
         solution = null;
         hintButton.setText("Show hints");
-        canvas.repaint();
-    }
-
-    private final class BoardCanvas extends JComponent {
-
-        private BoardCanvas() {
-            setPreferredSize(new Dimension(BOARD_PIXELS, BOARD_PIXELS));
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent event) {
-                    Point cell = cellAt(event.getPoint());
-                    if (cell != null) {
-                        pressCell(cell.y, cell.x);
-                    }
-                }
-            });
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            super.paintComponent(graphics);
-            Graphics2D graphics2D = (Graphics2D) graphics.create();
-            try {
-                graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON);
-                int cellSize = cellSize();
-                int originX = (getWidth() - cellSize * board.getSize()) / 2;
-                int originY = (getHeight() - cellSize * board.getSize()) / 2;
-
-                for (int row = 0; row < board.getSize(); row++) {
-                    for (int column = 0; column < board.getSize(); column++) {
-                        paintCell(graphics2D, row, column, originX, originY, cellSize);
-                    }
-                }
-            } finally {
-                graphics2D.dispose();
-            }
-        }
-
-        private void paintCell(Graphics2D graphics, int row, int column,
-                               int originX, int originY, int cellSize) {
-            int x = originX + column * cellSize;
-            int y = originY + row * cellSize;
-            boolean lightOn = board.isLightOn(row, column);
-
-            graphics.setColor(lightOn ? Color.WHITE : Color.BLACK);
-            graphics.fillRect(x, y, cellSize, cellSize);
-            graphics.setColor(GRID_COLOR);
-            graphics.drawRect(x, y, cellSize, cellSize);
-
-            int index = row * board.getSize() + column;
-            if (hintsVisible && solution != null && solution[index] == 1) {
-                int diameter = Math.max(8, cellSize / 3);
-                graphics.setColor(lightOn ? Color.BLACK : Color.WHITE);
-                graphics.fillOval(x + (cellSize - diameter) / 2,
-                        y + (cellSize - diameter) / 2, diameter, diameter);
-            }
-        }
-
-        private Point cellAt(Point point) {
-            int cellSize = cellSize();
-            int boardSize = cellSize * board.getSize();
-            int originX = (getWidth() - boardSize) / 2;
-            int originY = (getHeight() - boardSize) / 2;
-            if (point.x < originX || point.x >= originX + boardSize
-                    || point.y < originY || point.y >= originY + boardSize) {
-                return null;
-            }
-            return new Point((point.x - originX) / cellSize, (point.y - originY) / cellSize);
-        }
-
-        private int cellSize() {
-            return Math.max(1, Math.min(getWidth(), getHeight()) / board.getSize());
-        }
+        renderBoard();
     }
 }
