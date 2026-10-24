@@ -76,7 +76,7 @@ public final class GamePanel extends JPanel {
 
     private void finishGame() {
         String message = hintsUsed ? "You won! But you used hints." : "You won!";
-        JOptionPane.showMessageDialog(Game.contentPane, message);
+        JOptionPane.showMessageDialog(this, message);
         board.reset();
         hintsVisible = false;
         hintsUsed = false;
