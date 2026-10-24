@@ -160,8 +160,8 @@ public class Game extends JFrame implements ActionListener {
 		
 		JButton btnLetTheGame = new JButton("Let the game begin...");
 		btnLetTheGame.addActionListener(this);
-		btnLetTheGame.setForeground(Color.WHITE);
-		btnLetTheGame.setBackground(Color.BLACK);
+		btnLetTheGame.setForeground(Color.BLACK);
+		btnLetTheGame.setBackground(Color.WHITE);
 		btnLetTheGame.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnLetTheGame.setBounds(52, 238, 258, 55);
 		startGame.add(btnLetTheGame);

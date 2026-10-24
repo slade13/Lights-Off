@@ -12,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class PaintPanel5 extends JPanel {
 	/**
@@ -71,10 +72,11 @@ public class PaintPanel5 extends JPanel {
 				 * mouseSubtractor.y); System.out.println(mouseLocation.x + " "
 				 * + mouseLocation.y);
 				 */
-				System.out.println(checkClick());
-				if (checkClick() != -1) {
-					board = lightsOff(checkClick());
-					update(); 
+					int clicked = checkClick();
+					if (clicked != -1) {
+						board = lightsOff(clicked);
+						update();
+						checkIfWon();
 				}
 			}
 		};
@@ -84,7 +86,6 @@ public class PaintPanel5 extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		paintAll(g);
-		checkIfWon(g, desk.isSolved(board));
 	}
 
 	private int checkClick() {
@@ -169,16 +170,17 @@ public class PaintPanel5 extends JPanel {
 		//System.out.println();
 	}
 
-	public void checkIfWon(Graphics g, boolean solved) {
-		if (solved) {
-			// board = desk.randBoard(3);
-			helpWasUsed = helpStatus ? " But you were cheating!" : "";
-			JOptionPane.showMessageDialog(Game.contentPane,
-					"You won this game!" + helpWasUsed);
-			helpStatus = false;
-			helpWasUsed = "";
-			board = desk.randBoard(5);
-			paintAll(g);
+	public void checkIfWon() {
+		if (BoardUtils.isSolved(board)) {
+			SwingUtilities.invokeLater(() -> {
+				helpWasUsed = helpStatus ? " But you were cheating!" : "";
+				JOptionPane.showMessageDialog(Game.contentPane,
+						"You won this game!" + helpWasUsed);
+				helpStatus = false;
+				helpWasUsed = "";
+				board = BoardUtils.randBoard(5);
+				update();
+			});
 		}
 	}
 }

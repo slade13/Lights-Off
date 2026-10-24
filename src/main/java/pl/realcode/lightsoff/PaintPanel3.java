@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class PaintPanel3 extends JPanel {
 	/**
@@ -58,10 +59,11 @@ public class PaintPanel3 extends JPanel {
 				mouseLocation = new Point(e.getPoint().x - mouseSubtract.x,
 						e.getPoint().y - mouseSubtract.y);
 
-				System.out.println(checkClick());
-					if (checkClick() != -1) {
-						board = lightsOff(checkClick());
+					int clicked = checkClick();
+					if (clicked != -1) {
+						board = lightsOff(clicked);
 						update();
+						checkIfWon();
 					}
 			}
 		};
@@ -70,7 +72,6 @@ public class PaintPanel3 extends JPanel {
 
 	@Override
 	protected void paintComponent(Graphics g) {
-		checkIfWon();
 		paintAll(g);
 	}
 
@@ -151,14 +152,15 @@ public class PaintPanel3 extends JPanel {
 	}
 
 	public void checkIfWon() {
-		boolean solved = BoardUtils.isSolved(board);
-		if (solved) {
-			String message = "You won!";
-			message += helpStatus ? " But you were cheating!" : "";
-			JOptionPane.showMessageDialog(Game.contentPane,
-					 message);
-			helpStatus = false;
-			board = BoardUtils.randBoard(3);
+		if (BoardUtils.isSolved(board)) {
+			SwingUtilities.invokeLater(() -> {
+				String message = "You won!";
+				message += helpStatus ? " But you were cheating!" : "";
+				JOptionPane.showMessageDialog(Game.contentPane, message);
+				helpStatus = false;
+				board = BoardUtils.randBoard(3);
+				update();
+			});
 		}
 	}
 }

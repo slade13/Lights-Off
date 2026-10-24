@@ -12,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class PaintPanel4 extends JPanel {
 	/**
@@ -51,14 +52,11 @@ public class PaintPanel4 extends JPanel {
 				 * mouseSubtractor.y); System.out.println(mouseLocation.x + " "
 				 * + mouseLocation.y);
 				 */
-				System.out.println(checkClick());
-					if(checkClick() != -1) {
-						board = lightsOff(checkClick());
-						if (BoardUtils.isSolved(board)) {
-							JOptionPane.showMessageDialog(Game.contentPane, "You won!");
-							board = BoardUtils.randBoard(4);
-						}
+					int clicked = checkClick();
+					if (clicked != -1) {
+						board = lightsOff(clicked);
 						repaint();
+						checkIfWon();
 				}
 			}
 		};
@@ -117,5 +115,15 @@ public class PaintPanel4 extends JPanel {
 			}
 		}
 		return temp;
+	}
+
+	private void checkIfWon() {
+		if (BoardUtils.isSolved(board)) {
+			SwingUtilities.invokeLater(() -> {
+				JOptionPane.showMessageDialog(Game.contentPane, "You won!");
+				board = BoardUtils.randBoard(4);
+				repaint();
+			});
+		}
 	}
 }
