@@ -116,6 +116,7 @@ public class Game extends JFrame implements ActionListener {
 		
 		JPanel startGame = new JPanel();
 		startGame.setName("Start game");
+		startGame.setBackground(Color.BLACK);
 		contentPane.add(startGame, "STARTGAME");
 		startGame.setLayout(null);
 		
@@ -125,22 +126,29 @@ public class Game extends JFrame implements ActionListener {
 		startGame.add(btnBack_2);
 		
 		JLabel lblDifficulty = new JLabel("Difficulty:");
+		lblDifficulty.setForeground(Color.WHITE);
 		lblDifficulty.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		lblDifficulty.setBounds(52, 85, 77, 23);
 		startGame.add(lblDifficulty);
 		
 		JRadioButton diffEasy = new JRadioButton("easy");
+		diffEasy.setBackground(Color.BLACK);
+		diffEasy.setForeground(Color.WHITE);
 		diffEasy.setActionCommand("GAMEPLAYEASY");
 		diffEasy.setSelected(true);
 		diffEasy.setBounds(135, 90, 109, 23);
 		startGame.add(diffEasy);
 		
 		JRadioButton diffMedium = new JRadioButton("medium");
+		diffMedium.setBackground(Color.BLACK);
+		diffMedium.setForeground(Color.WHITE);
 		diffMedium.setActionCommand("GAMEPLAYMEDIUM");
 		diffMedium.setBounds(135, 130, 109, 23);
 		startGame.add(diffMedium);
 		
 		JRadioButton diffHard = new JRadioButton("hard");
+		diffHard.setBackground(Color.BLACK);
+		diffHard.setForeground(Color.WHITE);
 		diffHard.setActionCommand("GAMEPLAYHARD");
 		diffHard.setBounds(135, 170, 109, 23);
 		startGame.add(diffHard);
