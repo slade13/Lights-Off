@@ -27,5 +27,5 @@ mvn javafx:run
 - `LightsOutBoard` contains game state and move rules without Swing dependencies.
 - `BoardUtils` generates solvable boards and contains the GF(2) solver.
 - `GamePanel` renders every supported board size with JavaFX controls.
-- `Game` creates the JavaFX scenes and navigation.
+- `Game` is the IntelliJ-safe entry point and creates the JavaFX scenes and navigation.
 - `game.css` contains the visual theme without mixing styles into Java code.

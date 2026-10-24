@@ -18,15 +18,24 @@ import javafx.stage.Stage;
 
 import java.io.InputStream;
 
-public final class Game extends Application {
+public final class Game {
+
+    private Game() {
+    }
+
+    public static void main(String[] args) {
+        Application.launch(FxApplication.class, args);
+    }
+
+    public static final class FxApplication extends Application {
     private static final double WINDOW_WIDTH = 520;
     private static final double WINDOW_HEIGHT = 620;
 
     private Stage stage;
     private Scene scene;
 
-    @Override
-    public void start(Stage primaryStage) {
+        @Override
+        public void start(Stage primaryStage) {
         stage = primaryStage;
         scene = new Scene(createMainMenu(), WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.getStylesheets().add(requireResource("/styles/game.css"));
@@ -35,7 +44,7 @@ public final class Game extends Application {
         stage.setMinWidth(420);
         stage.setMinHeight(520);
         stage.show();
-    }
+        }
 
     private VBox createMainMenu() {
         Label title = new Label("LIGHTS OFF");
@@ -190,5 +199,7 @@ public final class Game extends Application {
             throw new IllegalStateException("Missing resource: " + path);
         }
         return Game.class.getResource(path).toExternalForm();
+    }
+
     }
 }

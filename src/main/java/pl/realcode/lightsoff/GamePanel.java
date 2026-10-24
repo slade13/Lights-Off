@@ -1,6 +1,7 @@
 package pl.realcode.lightsoff;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -94,7 +95,7 @@ public final class GamePanel extends BorderPane {
         renderBoard();
         if (board.isSolved()) {
             PauseTransition pause = new PauseTransition(Duration.millis(180));
-            pause.setOnFinished(event -> finishGame());
+            pause.setOnFinished(event -> Platform.runLater(this::finishGame));
             pause.play();
         }
     }
