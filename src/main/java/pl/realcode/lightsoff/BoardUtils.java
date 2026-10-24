@@ -2,42 +2,75 @@ package pl.realcode.lightsoff;
 
 import java.util.Random;
 
-public abstract class BoardUtils {
+/** Utility algorithms shared by the game model and its tests. */
+public final class BoardUtils {
 
+    private static final int[][] NEIGHBOUR_OFFSETS = {
+            {0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+    };
+
+    private BoardUtils() {
+    }
+
+    public static int[][] randomSolvableBoard(int size) {
+        return randomSolvableBoard(size, new Random());
+    }
+
+    /** @deprecated use {@link #randomSolvableBoard(int)} */
+    @Deprecated
     public static int[][] randBoard(int size) {
-        Random rand = new Random();
-        int[][] randomizedBoard = new int[size][size];
+        return randomSolvableBoard(size);
+    }
+
+    static int[][] randomSolvableBoard(int size, Random random) {
+        if (size < 1) {
+            throw new IllegalArgumentException("Board size must be positive");
+        }
+
+        int[][] board;
         do {
-            randomizedBoard = new int[size][size];
-            for (int i = 0; i < size; i++) {
-                for (int j = 0; j < size; j++) {
-                    if (rand.nextBoolean()) {
-                        toggle(randomizedBoard, i, j);
+            board = new int[size][size];
+            for (int row = 0; row < size; row++) {
+                for (int column = 0; column < size; column++) {
+                    if (random.nextBoolean()) {
+                        toggle(board, row, column);
                     }
                 }
             }
-        } while (isSolved(randomizedBoard));
-
-        return randomizedBoard;
+        } while (isSolved(board));
+        return board;
     }
 
-    private static void toggle(int[][] board, int row, int column) {
-        int[][] offsets = {{0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        for (int[] offset : offsets) {
-            int targetRow = row + offset[0];
-            int targetColumn = column + offset[1];
-            if (targetRow >= 0 && targetRow < board.length
-                    && targetColumn >= 0 && targetColumn < board[targetRow].length) {
-                board[targetRow][targetColumn] ^= 1;
+    public static boolean isSolved(int[][] board) {
+        validateBoard(board);
+        for (int[] row : board) {
+            for (int value : row) {
+                if (value != 0) {
+                    return false;
+                }
             }
         }
+        return true;
+    }
+
+    public static int[] matrixToVector(int[][] matrix) {
+        validateBoard(matrix);
+        int[] vector = new int[matrix.length * matrix[0].length];
+        int index = 0;
+        for (int[] row : matrix) {
+            for (int value : row) {
+                vector[index++] = value;
+            }
+        }
+        return vector;
     }
 
     /**
-     * Returns one set of button presses that solves the board, or {@code null}
-     * when the supplied state is not reachable.
+     * Solves the board over GF(2). Free variables are set to zero. Returns
+     * {@code null} when the supplied state is not reachable.
      */
     public static int[] solve(int[][] board) {
+        validateBoard(board);
         int rows = board.length;
         int columns = board[0].length;
         int variables = rows * columns;
@@ -58,14 +91,44 @@ public abstract class BoardUtils {
             }
         }
 
+        int rank = reduce(matrix, variables);
+        for (int row = rank; row < variables; row++) {
+            if (matrix[row][variables] == 1) {
+                return null;
+            }
+        }
+
+        int[] solution = new int[variables];
+        for (int row = 0; row < rank; row++) {
+            int pivotColumn = firstOne(matrix[row], variables);
+            solution[pivotColumn] = matrix[row][variables];
+        }
+        return solution;
+    }
+
+    static void toggle(int[][] board, int row, int column) {
+        validateBoard(board);
+        if (row < 0 || row >= board.length || column < 0 || column >= board[0].length) {
+            throw new IndexOutOfBoundsException("Cell outside board");
+        }
+        for (int[] offset : NEIGHBOUR_OFFSETS) {
+            int targetRow = row + offset[0];
+            int targetColumn = column + offset[1];
+            if (targetRow >= 0 && targetRow < board.length
+                    && targetColumn >= 0 && targetColumn < board[0].length) {
+                board[targetRow][targetColumn] ^= 1;
+            }
+        }
+    }
+
+    private static int reduce(int[][] matrix, int variableCount) {
         int pivotRow = 0;
-        int[] pivotColumns = new int[variables];
-        for (int column = 0; column < variables && pivotRow < variables; column++) {
+        for (int column = 0; column < variableCount && pivotRow < matrix.length; column++) {
             int candidate = pivotRow;
-            while (candidate < variables && matrix[candidate][column] == 0) {
+            while (candidate < matrix.length && matrix[candidate][column] == 0) {
                 candidate++;
             }
-            if (candidate == variables) {
+            if (candidate == matrix.length) {
                 continue;
             }
 
@@ -73,63 +136,41 @@ public abstract class BoardUtils {
             matrix[pivotRow] = matrix[candidate];
             matrix[candidate] = temporary;
 
-            for (int row = 0; row < variables; row++) {
+            for (int row = 0; row < matrix.length; row++) {
                 if (row != pivotRow && matrix[row][column] == 1) {
-                    for (int value = column; value <= variables; value++) {
+                    for (int value = column; value <= variableCount; value++) {
                         matrix[row][value] ^= matrix[pivotRow][value];
                     }
                 }
             }
-            pivotColumns[pivotRow] = column;
             pivotRow++;
         }
-
-        for (int row = pivotRow; row < variables; row++) {
-            if (matrix[row][variables] == 1) {
-                return null;
-            }
-        }
-
-        int[] solution = new int[variables];
-        for (int row = 0; row < pivotRow; row++) {
-            solution[pivotColumns[row]] = matrix[row][variables];
-        }
-        return solution;
+        return pivotRow;
     }
 
-    public static boolean isSolved(int[][] board) {
+    private static int firstOne(int[] row, int limit) {
+        for (int column = 0; column < limit; column++) {
+            if (row[column] == 1) {
+                return column;
+            }
+        }
+        throw new IllegalStateException("Reduced row has no pivot");
+    }
+
+    private static void validateBoard(int[][] board) {
+        if (board == null || board.length == 0 || board[0] == null || board[0].length == 0) {
+            throw new IllegalArgumentException("Board cannot be empty");
+        }
+        int columns = board[0].length;
         for (int[] row : board) {
+            if (row == null || row.length != columns) {
+                throw new IllegalArgumentException("Board must be rectangular");
+            }
             for (int value : row) {
-                if (value == 1) {
-                    return false;
+                if (value != 0 && value != 1) {
+                    throw new IllegalArgumentException("Board values must be zero or one");
                 }
             }
         }
-        return true;
-    }
-
-    public static int[] matrixToVector(int[][] matrix) {
-        int sizeM = matrix.length;
-        int sizeN = matrix[0].length;
-        int[] vector = new int[sizeM * sizeN];
-        int index = 0;
-        for (int[] row : matrix) {
-            for (int value : row) {
-                vector[index] = value;
-                index++;
-            }
-        }
-        return vector;
-    }
-
-    public static String toString(int[][] board) {
-        StringBuilder boardString = new StringBuilder();
-        for (int[] row : board) {
-            for (int value : row) {
-                boardString.append(value).append(" ");
-            }
-            boardString.append("\n");
-        }
-        return boardString.toString();
     }
 }

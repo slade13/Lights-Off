@@ -23,7 +23,7 @@ public class PaintPanel3 extends JPanel {
 
 	private static final int n = 10;
 	private static final int m = 9;
-	int[][] board = Board3x3.randBoard(3);
+	int[][] board = BoardUtils.randBoard(3);
 	int[] vector = new int[m];
 	Rectangle[] rect = new Rectangle[m];
 	Dimension squareSize = new Dimension(100, 100);

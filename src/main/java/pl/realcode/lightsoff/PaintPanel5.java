@@ -21,7 +21,7 @@ public class PaintPanel5 extends JPanel {
 	private static final long serialVersionUID = -4619705722834246507L;
 	private Point mouseLocation;
 	Board5x5 desk = new Board5x5();
-	int[][] board = desk.randBoard(5);
+	int[][] board = BoardUtils.randBoard(5);
 	// int[][] board = {{0,1,0},{1,1,0},{0,1,1}};
 	int[] vector = new int[25];
 	Rectangle[] rect = new Rectangle[25];
