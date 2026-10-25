@@ -32,3 +32,4 @@ mvn javafx:run
 - `BoardView` is the shared board renderer used by gameplay and the live tutorial.
 - `Game` is the IntelliJ-safe entry point and creates the JavaFX scenes and navigation.
 - `game.css` contains the visual theme without mixing styles into Java code.
+- `module-info.java` runs JavaFX on the module path instead of the unsupported classpath mode.

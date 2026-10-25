@@ -1,6 +1,8 @@
 .root { -fx-font-family: "Inter", "Segoe UI", sans-serif; -fx-font-size: 15px; -fx-background-color: #f5f7fb; }
 .screen, .game-screen { -fx-background-color: #f5f7fb; }
 .light-screen { -fx-background-color: linear-gradient(to bottom, #f8fafc, #e2e8f0); }
+.light-screen .secondary-button { -fx-background-color: #0f172a; -fx-text-fill: white; }
+.light-screen .secondary-button:hover { -fx-background-color: #334155; }
 .dark-screen { -fx-background-color: radial-gradient(center 50% 28%, radius 78%, #1e3a5f, #020617 72%); }
 .app-title { -fx-font-size: 42px; -fx-font-weight: 800; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, #38bdf8, 28, 0.35, 0, 0); }
 .subtitle { -fx-font-size: 17px; -fx-text-fill: #94a3b8; }

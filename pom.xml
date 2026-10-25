@@ -35,7 +35,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>pl.realcode.lightsoff.Game</mainClass>
+                    <mainClass>pl.realcode.lightsoff/pl.realcode.lightsoff.Game</mainClass>
                 </configuration>
             </plugin>
             <plugin>
