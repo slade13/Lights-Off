@@ -8,11 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
 import javafx.util.Duration;
 
 /** Reusable JavaFX game view for every supported board size. */
@@ -20,9 +16,8 @@ public final class GamePanel extends BorderPane {
     private static final double BOARD_SIZE = 400;
 
     private final LightsOutBoard board;
-    private final Button[][] cells;
     private final Button hintButton = new Button("Show hints");
-    private final GridPane grid = new GridPane();
+    private final BoardView boardView;
 
     private boolean hintsVisible;
     private boolean hintsUsed;
@@ -30,7 +25,7 @@ public final class GamePanel extends BorderPane {
 
     public GamePanel(int size, String difficulty, Runnable onBack) {
         board = new LightsOutBoard(size);
-        cells = new Button[size][size];
+        boardView = new BoardView(size, BOARD_SIZE, this::pressCell);
         getStyleClass().add("game-screen");
         setPadding(new Insets(24));
         setTop(createHeading(difficulty));
@@ -47,34 +42,9 @@ public final class GamePanel extends BorderPane {
         return heading;
     }
 
-    private GridPane createBoard() {
-        grid.setAlignment(Pos.CENTER);
-        grid.setMaxSize(BOARD_SIZE, BOARD_SIZE);
-        grid.setPrefSize(BOARD_SIZE, BOARD_SIZE);
-        grid.getStyleClass().add("board");
-        for (int index = 0; index < board.getSize(); index++) {
-            ColumnConstraints column = new ColumnConstraints();
-            column.setPercentWidth(100.0 / board.getSize());
-            column.setHgrow(Priority.ALWAYS);
-            grid.getColumnConstraints().add(column);
-            RowConstraints row = new RowConstraints();
-            row.setPercentHeight(100.0 / board.getSize());
-            row.setVgrow(Priority.ALWAYS);
-            grid.getRowConstraints().add(row);
-        }
-        for (int row = 0; row < board.getSize(); row++) {
-            for (int column = 0; column < board.getSize(); column++) {
-                Button cell = new Button();
-                cell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                cell.getStyleClass().add("board-cell");
-                int selectedRow = row;
-                int selectedColumn = column;
-                cell.setOnAction(event -> pressCell(selectedRow, selectedColumn));
-                cells[row][column] = cell;
-                grid.add(cell, column, row);
-            }
-        }
-        return grid;
+    private BoardView createBoard() {
+        boardView.setAlignment(Pos.CENTER);
+        return boardView;
     }
 
     private HBox createControls(Runnable onBack) {
@@ -109,17 +79,7 @@ public final class GamePanel extends BorderPane {
     }
 
     private void renderBoard() {
-        for (int row = 0; row < board.getSize(); row++) {
-            for (int column = 0; column < board.getSize(); column++) {
-                Button cell = cells[row][column];
-                cell.getStyleClass().removeAll("light-on", "light-off", "hint");
-                cell.getStyleClass().add(board.isLightOn(row, column) ? "light-on" : "light-off");
-                int index = row * board.getSize() + column;
-                if (hintsVisible && solution != null && solution[index] == 1) {
-                    cell.getStyleClass().add("hint");
-                }
-            }
-        }
+        boardView.render(board, hintsVisible ? solution : null);
     }
 
     private void finishGame() {
