@@ -77,11 +77,12 @@ public final class Game {
             int size = (int) selected.getUserData();
             showGame(size, difficultyName(size));
         });
+        start.getStyleClass().add("accent-button");
         VBox content = new VBox(18, title, spacer(10), easy, medium, hard,
                 spacer(22), start, secondaryButton("Main menu", this::showMainMenu));
         content.setAlignment(Pos.CENTER);
         content.setPadding(new Insets(45));
-        content.getStyleClass().addAll("screen", "dark-screen");
+        content.getStyleClass().addAll("screen", "light-screen");
         show(content, "Choose difficulty");
     }
 
@@ -96,6 +97,7 @@ public final class Game {
         steps.getStyleClass().add("tutorial-content");
         Label title = new Label("How to play");
         title.getStyleClass().add("screen-title");
+        title.setFocusTraversable(true);
         steps.getChildren().add(title);
         Label explanation = new Label(
                 "Pressing a square changes it and its direct neighbours. "
@@ -105,14 +107,22 @@ public final class Game {
         explanation.getStyleClass().add("tutorial-description");
         steps.getChildren().add(explanation);
         addTutorialBoards(steps);
-        steps.getChildren().add(secondaryButton("Main menu", this::showMainMenu));
+        Button backButton = secondaryButton("Main menu", this::showMainMenu);
+        backButton.setFocusTraversable(false);
+        steps.getChildren().add(backButton);
 
         ScrollPane scrollPane = new ScrollPane(steps);
         scrollPane.setFitToWidth(true);
         scrollPane.setPannable(true);
+        scrollPane.setVvalue(0);
         scrollPane.getStyleClass().add("screen");
         show(scrollPane, "Tutorial");
-        Platform.runLater(() -> scrollPane.setVvalue(scrollPane.getVmin()));
+        Platform.runLater(() -> {
+            title.requestFocus();
+            scrollPane.applyCss();
+            scrollPane.layout();
+            scrollPane.setVvalue(scrollPane.getVmin());
+        });
     }
 
     private void showTextScreen(String titleText, String body) {
