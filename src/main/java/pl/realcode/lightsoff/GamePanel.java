@@ -63,6 +63,7 @@ public final class GamePanel extends BorderPane {
         board.press(row, column);
         solution = hintsVisible ? board.findSolution() : null;
         renderBoard();
+        boardView.animateMove(row, column);
         if (board.isSolved()) {
             PauseTransition pause = new PauseTransition(Duration.millis(180));
             pause.setOnFinished(event -> Platform.runLater(this::finishGame));

@@ -1,21 +1,21 @@
 .root { -fx-font-family: "Inter", "Segoe UI", sans-serif; -fx-font-size: 15px; -fx-background-color: #f5f7fb; }
 .screen, .game-screen { -fx-background-color: #f5f7fb; }
-.dark-screen { -fx-background-color: linear-gradient(to bottom right, #111827, #020617); }
-.app-title { -fx-font-size: 42px; -fx-font-weight: 800; -fx-text-fill: white; }
+.dark-screen { -fx-background-color: radial-gradient(center 50% 28%, radius 78%, #1e3a5f, #020617 72%); }
+.app-title { -fx-font-size: 42px; -fx-font-weight: 800; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, #38bdf8, 28, 0.35, 0, 0); }
 .subtitle { -fx-font-size: 17px; -fx-text-fill: #94a3b8; }
 .screen-title { -fx-font-size: 26px; -fx-font-weight: 700; -fx-text-fill: #0f172a; }
 .dark-screen .screen-title { -fx-text-fill: white; }
 .primary-button, .secondary-button { -fx-cursor: hand; -fx-background-radius: 9px; -fx-padding: 11px 22px; -fx-font-weight: 700; }
 .primary-button { -fx-background-color: white; -fx-text-fill: #0f172a; }
-.primary-button:hover { -fx-background-color: #dbeafe; }
+.primary-button:hover { -fx-background-color: #dbeafe; -fx-effect: dropshadow(gaussian, rgba(56,189,248,0.65), 18, 0.25, 0, 4); -fx-translate-y: -2px; }
 .secondary-button { -fx-background-color: #e2e8f0; -fx-text-fill: #0f172a; }
-.secondary-button:hover { -fx-background-color: #cbd5e1; }
+.secondary-button:hover { -fx-background-color: #cbd5e1; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.25), 12, 0.2, 0, 3); -fx-translate-y: -1px; }
 .difficulty-option { -fx-text-fill: white; -fx-font-size: 17px; -fx-cursor: hand; }
 .board { -fx-background-color: #475569; -fx-hgap: 2px; -fx-vgap: 2px; -fx-padding: 2px; -fx-background-radius: 8px; }
 .board-cell { -fx-cursor: hand; -fx-background-radius: 5px; -fx-border-width: 0; }
-.board-cell.light-on { -fx-background-color: #f8fafc; -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.75), 14, 0.25, 0, 0); }
+.board-cell.light-on { -fx-background-color: radial-gradient(center 50% 45%, radius 70%, white, #bae6fd); -fx-effect: dropshadow(gaussian, rgba(125,211,252,0.95), 22, 0.4, 0, 0); }
 .board-cell.light-off { -fx-background-color: #020617; }
-.board-cell.hint { -fx-border-color: #f97316; -fx-border-width: 5px; -fx-border-radius: 5px; }
+.board-cell.hint { -fx-border-color: #fb923c; -fx-border-width: 5px; -fx-border-radius: 5px; -fx-effect: dropshadow(gaussian, rgba(249,115,22,0.9), 20, 0.45, 0, 0); }
 .tutorial-content { -fx-background-color: #f5f7fb; }
 .tutorial-label { -fx-font-size: 17px; -fx-font-weight: 700; }
 .tutorial-description { -fx-text-fill: #475569; -fx-text-alignment: center; }

@@ -1,6 +1,10 @@
 package pl.realcode.lightsoff;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,6 +17,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public final class Game {
 
@@ -86,7 +91,7 @@ public final class Game {
 
     private void showTutorial() {
         VBox steps = new VBox(22);
-        steps.setAlignment(Pos.CENTER);
+        steps.setAlignment(Pos.TOP_CENTER);
         steps.setPadding(new Insets(24));
         steps.getStyleClass().add("tutorial-content");
         Label title = new Label("How to play");
@@ -104,8 +109,10 @@ public final class Game {
 
         ScrollPane scrollPane = new ScrollPane(steps);
         scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
         scrollPane.getStyleClass().add("screen");
         show(scrollPane, "Tutorial");
+        Platform.runLater(() -> scrollPane.setVvalue(scrollPane.getVmin()));
     }
 
     private void showTextScreen(String titleText, String body) {
@@ -126,8 +133,18 @@ public final class Game {
     }
 
     private void show(Region root, String title) {
+        root.setOpacity(0);
+        root.setTranslateY(18);
         scene.setRoot(root);
         stage.setTitle("Lights Off — " + title);
+
+        FadeTransition fade = new FadeTransition(Duration.millis(280), root);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        TranslateTransition slide = new TranslateTransition(Duration.millis(280), root);
+        slide.setFromY(18);
+        slide.setToY(0);
+        new ParallelTransition(fade, slide).play();
     }
 
     private static Button navigationButton(String text, Runnable action) {

@@ -1,10 +1,13 @@
 package pl.realcode.lightsoff;
 
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
 import javafx.scene.control.Button;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Duration;
 
 import java.util.function.BiConsumer;
 
@@ -42,6 +45,8 @@ final class BoardView extends GridPane {
                     int selectedRow = row;
                     int selectedColumn = column;
                     cell.setOnAction(event -> onCellPressed.accept(selectedRow, selectedColumn));
+                    cell.setOnMouseEntered(event -> animateScale(cell, 1.04, 110));
+                    cell.setOnMouseExited(event -> animateScale(cell, 1.0, 110));
                 } else {
                     cell.setMouseTransparent(true);
                 }
@@ -57,6 +62,31 @@ final class BoardView extends GridPane {
 
     void render(int[][] state, int[] highlightedCells) {
         render((row, column) -> state[row][column] == 1, highlightedCells);
+    }
+
+    void animateMove(int pressedRow, int pressedColumn) {
+        int[][] offsets = {{0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        ParallelTransition animation = new ParallelTransition();
+        for (int[] offset : offsets) {
+            int row = pressedRow + offset[0];
+            int column = pressedColumn + offset[1];
+            if (row >= 0 && row < size && column >= 0 && column < size) {
+                ScaleTransition pulse = new ScaleTransition(Duration.millis(140), cells[row][column]);
+                pulse.setFromX(0.82);
+                pulse.setFromY(0.82);
+                pulse.setToX(1.0);
+                pulse.setToY(1.0);
+                animation.getChildren().add(pulse);
+            }
+        }
+        animation.play();
+    }
+
+    private static void animateScale(Button cell, double scale, double durationMillis) {
+        ScaleTransition transition = new ScaleTransition(Duration.millis(durationMillis), cell);
+        transition.setToX(scale);
+        transition.setToY(scale);
+        transition.play();
     }
 
     private void render(CellState state, int[] highlightedCells) {
